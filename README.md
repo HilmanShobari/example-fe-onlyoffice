@@ -1,70 +1,201 @@
-# Getting Started with Create React App
+# OnlyOffice Document Manager - React Integration
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Aplikasi React untuk mengelola dan mengedit dokumen menggunakan OnlyOffice Document Server dengan komponen resmi `@onlyoffice/document-editor-react`.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- ✅ **Upload dokumen** dengan drag & drop support
+- ✅ **View/Edit dokumen** menggunakan OnlyOffice Document Server
+- ✅ **Support multiple format**: Word (.doc/.docx), Excel (.xls/.xlsx), PowerPoint (.ppt/.pptx), PDF, dan text files
+- ✅ **Real-time editing** dan collaboration
+- ✅ **File management** (upload, delete, list)
+- ✅ **Responsive design** dengan modern UI
+- ✅ **Error handling** dan troubleshooting guide
 
-### `npm start`
+## Architecture
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React app (localhost:3000) dengan `@onlyoffice/document-editor-react`
+- **Backend**: Express server (localhost:3001) dengan API endpoints
+- **OnlyOffice**: Document Server (localhost:8888) dalam Docker container
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation & Setup
 
-### `npm test`
+### 1. Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (14+ recommended)
+- Docker (untuk OnlyOffice Document Server)
+- Git
 
-### `npm run build`
+### 2. Clone Repository
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+git clone <repository-url>
+cd example-fe
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. Install Dependencies
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+npm install
+```
 
-### `npm run eject`
+### 4. Setup OnlyOffice Document Server
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Jalankan OnlyOffice Document Server menggunakan Docker:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+docker run -i -t -d -p 8888:80 --restart=always onlyoffice/documentserver
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 5. Configure OnlyOffice
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Buka OnlyOffice Management interface di `http://localhost:8888/Management.aspx?type=17` dan set:
 
-## Learn More
+- **Document Editing Service Address**: `http://localhost:8888/`
+- **Document Service address for requests from Community Server**: `http://localhost:8888/`
+- **Community Server address for requests from Document Service**: `http://localhost:3001/`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 6. Run Application
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run dev
+```
 
-### Code Splitting
+Ini akan menjalankan:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- Backend server di `http://localhost:3001`
+- React app di `http://localhost:3000`
 
-### Analyzing the Bundle Size
+## Component Architecture
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### OnlyOfficeEditor Component
 
-### Making a Progressive Web App
+Menggunakan komponen resmi `@onlyoffice/document-editor-react` dengan features:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```javascript
+import { DocumentEditor } from '@onlyoffice/document-editor-react';
 
-### Advanced Configuration
+<DocumentEditor id={`onlyoffice-editor-${file.id}`} documentServerUrl="http://localhost:8888/" config={config} events_onDocumentReady={onDocumentReady} events_onDocumentStateChange={onDocumentStateChange} events_onError={onError} onLoadComponentError={onLoadComponentError} height="100%" width="100%" />;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Key Features:
 
-### Deployment
+1. **Automatic script loading**: Komponen official menangani loading OnlyOffice API secara otomatis
+2. **Event handling**: Built-in event handlers untuk document ready, state changes, dan errors
+3. **Error management**: Proper error handling dengan user-friendly messages
+4. **Mode switching**: Support untuk Edit/View mode switching
+5. **Responsive design**: Full width/height dengan responsive layout
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## API Endpoints
 
-### `npm run build` fails to minify
+### Backend (localhost:3001)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- `GET /api/health` - Health check
+- `GET /api/files` - List uploaded files
+- `POST /api/upload` - Upload file
+- `GET /api/file/:id` - Get file configuration for OnlyOffice
+- `POST /api/callback/:id` - OnlyOffice callback untuk saving
+- `DELETE /api/file/:id` - Delete file
+- `GET /api/onlyoffice/healthcheck` - OnlyOffice server health check
+
+### OnlyOffice Document Server (localhost:8888)
+
+- `/healthcheck` - Health check
+- `/web-apps/apps/api/documents/api.js` - OnlyOffice API script
+- File serving dan document processing
+
+## File Configuration
+
+OnlyOffice configuration yang digunakan:
+
+```javascript
+{
+    document: {
+        fileType: "docx",           // File extension
+        key: "unique-document-key", // MD5 hash untuk versioning
+        title: "document.docx",     // Display name
+        url: "http://localhost:3001/uploads/document.docx"
+    },
+    documentType: "text",           // text/spreadsheet/presentation
+    editorConfig: {
+        mode: "edit",               // edit/view
+        lang: "id",                 // Language
+        callbackUrl: "http://localhost:3001/api/callback/document.docx",
+        user: {
+            id: "user-1",
+            name: "User"
+        }
+    },
+    height: "100%",
+    width: "100%"
+}
+```
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **OnlyOffice tidak load**:
+
+   - Pastikan Docker container berjalan di port 8888
+   - Check `http://localhost:8888/healthcheck` harus return `true`
+   - Periksa OnlyOffice configuration di Management panel
+
+2. **CORS Errors**:
+
+   - Backend sudah menggunakan proxy untuk OnlyOffice requests
+   - Pastikan CORS settings di backend sudah benar
+
+3. **File tidak bisa dibuka**:
+
+   - Check format file yang didukung
+   - Pastikan file size tidak melebihi 50MB limit
+   - Periksa logs di browser console dan backend
+
+4. **Infinite loop requests**:
+   - Sudah diatasi dengan penggunaan komponen official
+   - Rate limiting di backend mencegah spam requests
+
+### Development
+
+```bash
+# Jalankan backend saja
+npm run server
+
+# Jalankan frontend saja
+npm start
+
+# Jalankan keduanya
+npm run dev
+```
+
+### Production Build
+
+```bash
+npm run build
+```
+
+## Dependencies
+
+### Main Dependencies:
+
+- `@onlyoffice/document-editor-react` - Official OnlyOffice React component
+- `react` - React framework
+- `axios` - HTTP client
+- `express` - Backend server
+- `multer` - File upload handling
+- `cors` - CORS middleware
+
+### Key Benefits dari Official Component:
+
+1. **Maintenance**: Officially maintained oleh OnlyOffice team
+2. **Documentation**: [Complete API documentation](https://api.onlyoffice.com/docs/docs-api/get-started/frontend-frameworks/react/)
+3. **Stability**: Tested dan stable untuk production use
+4. **Features**: Built-in error handling, event management, dan lifecycle control
+5. **Updates**: Regular updates dengan OnlyOffice Document Server
+
+## References
+
+- [OnlyOffice React Component Documentation](https://api.onlyoffice.com/docs/docs-api/get-started/frontend-frameworks/react/)
+- [OnlyOffice Docs API](https://api.onlyoffice.com/docs/docs-api/)
+- [OnlyOffice Docker Installation](https://github.com/ONLYOFFICE/Docker-DocumentServer)
