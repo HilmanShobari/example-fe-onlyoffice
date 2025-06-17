@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './FileList.css';
 
-const FileList = ({ refreshTrigger, onFileSelect }) => {
+const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -130,9 +130,16 @@ const FileList = ({ refreshTrigger, onFileSelect }) => {
                             </div>
                             <div className="file-actions">
                                 <button
+                                    onClick={() => onFileView(file)}
+                                    className="action-btn view-btn"
+                                    title="View (Clean Preview)"
+                                >
+                                    👁️
+                                </button>
+                                <button
                                     onClick={() => onFileSelect(file)}
                                     className="action-btn edit-btn"
-                                    title="Edit/View"
+                                    title="Edit/View with OnlyOffice"
                                 >
                                     ✏️
                                 </button>
