@@ -1013,3 +1013,334 @@
     margin-top: 20px;
   }
 }
+
+/* Enhanced Word Controls */
+.word-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.viewer-info {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+/* Mammoth Viewer Styles */
+.mammoth-viewer {
+  border-left: 4px solid #4a90e2;
+}
+
+/* DOCX Preview Styles */
+.docx-preview-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border-left: 4px solid #28a745;
+}
+
+.docx-preview-container {
+  padding: 20px;
+  min-height: 500px;
+  font-family: 'Times New Roman', serif;
+  line-height: 1.6;
+  color: #333;
+  background: white;
+}
+
+/* DOCX Preview specific styling */
+.docx-preview-container .docx {
+  max-width: 100%;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+}
+
+.docx-preview-container .docx-wrapper {
+  background: #f5f5f5;
+  padding: 20px;
+  min-height: 500px;
+}
+
+.docx-preview-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.docx-preview-container table td,
+.docx-preview-container table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.docx-preview-container table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* React Doc Viewer Styles */
+.react-doc-viewer-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border-left: 4px solid #17a2b8;
+  min-height: 600px;
+}
+
+.react-doc-viewer-wrapper .react-doc-viewer {
+  border-radius: 8px;
+}
+
+.react-doc-viewer-wrapper .react-doc-viewer > div {
+  border-radius: 8px;
+}
+
+/* Override react-doc-viewer default styles */
+.react-doc-viewer-wrapper .react-doc-viewer .document-controls {
+  background: #f8f9fa !important;
+  border-bottom: 1px solid #e9ecef !important;
+  padding: 10px 15px !important;
+}
+
+.react-doc-viewer-wrapper .react-doc-viewer .document-controls button {
+  background: #6c757d !important;
+  color: white !important;
+  border: none !important;
+  padding: 6px 12px !important;
+  border-radius: 4px !important;
+  margin-right: 8px !important;
+  cursor: pointer !important;
+}
+
+.react-doc-viewer-wrapper .react-doc-viewer .document-controls button:hover {
+  background: #545b62 !important;
+}
+
+/* Viewer Comparison Styles */
+.viewer-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.viewer-option {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.viewer-option:hover {
+  border-color: #4a90e2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+}
+
+.viewer-option h5 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.viewer-option p {
+  margin: 0;
+  color: #666;
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+/* Enhanced Property Grid */
+.property-grid .property .viewer-name {
+  font-weight: 600;
+  color: #17a2b8;
+  background: rgba(23, 162, 184, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Viewer Type Specific Colors */
+.word-content .mammoth-viewer {
+  border-left-color: #4a90e2;
+}
+
+.word-content .docx-preview-wrapper {
+  border-left-color: #28a745;
+}
+
+.word-content .react-doc-viewer-wrapper {
+  border-left-color: #17a2b8;
+}
+
+/* Enhanced Error Actions */
+.error-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.error-btn {
+  padding: 6px 12px;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.error-btn:hover {
+  background: #545b62;
+  text-decoration: none;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Loading Enhancements */
+.loading-subtitle {
+  margin-top: 8px;
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* Viewer Select Enhancements */
+.viewer-select {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 0.9em;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.viewer-select option {
+  background: #2c3e50;
+  color: white;
+  padding: 4px;
+}
+
+/* Action Button Enhancements */
+.action-button.viewer {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-button.viewer:hover {
+  background: linear-gradient(135deg, #138496, #117a8b);
+  transform: translateY(-2px);
+}
+
+.action-button.viewer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.action-button.viewer:hover::before {
+  left: 100%;
+}
+
+/* Fallback Options Grid Enhancement */
+.fallback-options-grid .fallback-option:nth-child(1) {
+  border-color: #17a2b8;
+}
+
+.fallback-options-grid .fallback-option:nth-child(1):hover {
+  border-color: #138496;
+  box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+}
+
+.fallback-options-grid .fallback-option:nth-child(1) .fallback-btn.primary {
+  background: #17a2b8;
+}
+
+.fallback-options-grid .fallback-option:nth-child(1) .fallback-btn.primary:hover {
+  background: #138496;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .word-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .viewer-info {
+    text-align: center;
+    order: -1;
+  }
+
+  .viewer-select {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .viewer-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .docx-preview-container,
+  .word-html-content {
+    padding: 15px;
+  }
+
+  .react-doc-viewer-wrapper {
+    min-height: 400px;
+  }
+
+  .error-actions {
+    flex-direction: column;
+  }
+
+  .error-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .viewer-comparison {
+    gap: 10px;
+  }
+
+  .viewer-option {
+    padding: 12px;
+  }
+
+  .docx-preview-container .docx {
+    padding: 20px;
+  }
+
+  .word-html-content {
+    padding: 15px;
+    font-size: 0.9em;
+  }
+}

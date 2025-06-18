@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import mammoth from 'mammoth';
+import { renderAsync } from 'docx-preview';
+import DocViewer, { DocViewerRenderers } from 'react-doc-viewer';
 import './DocumentViewer.css';
 
 const DocumentViewer = ({ file, onClose }) => {
@@ -9,6 +11,7 @@ const DocumentViewer = ({ file, onClose }) => {
     const [error, setError] = useState(null);
     const [viewMode, setViewMode] = useState('preview');
     const [viewerType, setViewerType] = useState('auto');
+    const docxPreviewRef = useRef(null);
 
     useEffect(() => {
         if (file) {
@@ -31,7 +34,7 @@ const DocumentViewer = ({ file, onClose }) => {
                 // For PDF files, use iframe
                 setContent(file.url);
             } else if (['doc', 'docx'].includes(fileExtension)) {
-                // For Word documents, use mammoth.js for local conversion
+                // For Word documents, use selected viewer
                 await loadWordDocument();
             } else if (['xls', 'xlsx', 'ppt', 'pptx'].includes(fileExtension)) {
                 // For other Office documents, try external viewers
@@ -50,7 +53,7 @@ const DocumentViewer = ({ file, onClose }) => {
 
     const loadWordDocument = async () => {
         try {
-            console.log('Loading Word document with mammoth.js...');
+            console.log(`Loading Word document with ${viewerType} viewer...`);
             
             // Fetch the file as ArrayBuffer
             const response = await fetch(file.url);
@@ -60,18 +63,56 @@ const DocumentViewer = ({ file, onClose }) => {
             
             const arrayBuffer = await response.arrayBuffer();
             
-            // Convert .docx to HTML using mammoth
-            const result = await mammoth.convertToHtml({ arrayBuffer });
-            
-            if (result.value) {
-                setContent(result.value);
-                
-                // Log any warnings
-                if (result.messages && result.messages.length > 0) {
-                    console.warn('Mammoth conversion warnings:', result.messages);
+            if (viewerType === 'mammoth') {
+                // Use Mammoth.js
+                const result = await mammoth.convertToHtml({ arrayBuffer });
+                if (result.value) {
+                    setContent(result.value);
+                    if (result.messages && result.messages.length > 0) {
+                        console.warn('Mammoth conversion warnings:', result.messages);
+                    }
+                } else {
+                    throw new Error('Failed to convert document with Mammoth');
                 }
+            } else if (viewerType === 'docx-preview') {
+                // Use docx-preview
+                if (docxPreviewRef.current) {
+                    // Clear previous content
+                    docxPreviewRef.current.innerHTML = '';
+                    
+                    // Render with docx-preview
+                    await renderAsync(arrayBuffer, docxPreviewRef.current, null, {
+                        className: 'docx-preview-container',
+                        inWrapper: true,
+                        ignoreWidth: false,
+                        ignoreHeight: false,
+                        ignoreFonts: false,
+                        breakPages: true,
+                        ignoreLastRenderedPageBreak: true,
+                        experimental: true,
+                        trimXmlDeclaration: true,
+                        useBase64URL: false,
+                        useMathMLPolyfill: true,
+                        showChanges: false,
+                        debug: false
+                    });
+                    
+                    setContent('docx-preview-rendered');
+                }
+            } else if (viewerType === 'react-doc-viewer') {
+                // Use react-doc-viewer (will be handled in render)
+                setContent(file.url);
             } else {
-                throw new Error('Failed to convert document');
+                // Auto mode - try Mammoth first
+                const result = await mammoth.convertToHtml({ arrayBuffer });
+                if (result.value) {
+                    setContent(result.value);
+                    if (result.messages && result.messages.length > 0) {
+                        console.warn('Mammoth conversion warnings:', result.messages);
+                    }
+                } else {
+                    throw new Error('Failed to convert document');
+                }
             }
             
         } catch (err) {
@@ -86,9 +127,14 @@ const DocumentViewer = ({ file, onClose }) => {
             <div class="word-fallback">
                 <div class="fallback-header">
                     <h3>📄 Word Document Preview</h3>
-                    <p>Konversi lokal gagal. Gunakan opsi di bawah untuk melihat dokumen:</p>
+                    <p>Konversi dengan ${viewerType} gagal. Gunakan opsi di bawah untuk melihat dokumen:</p>
                 </div>
                 <div class="fallback-options-grid">
+                    <div class="fallback-option">
+                        <h4>🔄 Coba Viewer Lain</h4>
+                        <p>Gunakan viewer yang berbeda untuk konversi</p>
+                        <button onclick="window.switchViewer && window.switchViewer()" class="fallback-btn primary">Switch Viewer</button>
+                    </div>
                     <div class="fallback-option">
                         <h4>🔗 Buka di Browser</h4>
                         <p>Download dan buka dengan aplikasi default</p>
@@ -108,6 +154,26 @@ const DocumentViewer = ({ file, onClose }) => {
             </div>
         `;
     };
+
+    // Add window function for fallback buttons
+    useEffect(() => {
+        window.switchViewer = () => {
+            const viewers = ['mammoth', 'docx-preview', 'react-doc-viewer', 'external'];
+            const currentIndex = viewers.indexOf(viewerType);
+            const nextIndex = (currentIndex + 1) % viewers.length;
+            setViewerType(viewers[nextIndex]);
+        };
+        
+        window.useOnlyOffice = () => {
+            // This would trigger OnlyOffice editor - implement as needed
+            console.log('Opening OnlyOffice editor...');
+        };
+        
+        return () => {
+            delete window.switchViewer;
+            delete window.useOnlyOffice;
+        };
+    }, [viewerType]);
 
     const getFileIcon = (extension) => {
         switch (extension) {
@@ -146,6 +212,21 @@ const DocumentViewer = ({ file, onClose }) => {
                 return 'Text';
             default:
                 return 'Document';
+        }
+    };
+
+    const getViewerName = (type) => {
+        switch (type) {
+            case 'mammoth':
+                return 'Mammoth.js';
+            case 'docx-preview':
+                return 'DOCX Preview';
+            case 'react-doc-viewer':
+                return 'React Doc Viewer';
+            case 'external':
+                return 'External Viewer';
+            default:
+                return 'Auto';
         }
     };
 
@@ -209,10 +290,16 @@ const DocumentViewer = ({ file, onClose }) => {
                                 value={viewerType}
                                 onChange={(e) => setViewerType(e.target.value)}
                             >
-                                <option value="auto">Auto (Mammoth.js)</option>
-                                <option value="download">Download & Open</option>
-                                <option value="external">External Viewer</option>
+                                <option value="auto">🔄 Auto (Mammoth.js)</option>
+                                <option value="mammoth">🔤 Mammoth.js</option>
+                                <option value="docx-preview">📖 DOCX Preview</option>
+                                <option value="react-doc-viewer">⚛️ React Doc Viewer</option>
+                                <option value="external">🌐 External Viewer</option>
+                                <option value="download">💾 Download & Open</option>
                             </select>
+                            <span className="viewer-info">
+                                Using: {getViewerName(viewerType)}
+                            </span>
                             <a href={file.url} target="_blank" rel="noopener noreferrer" className="control-btn">
                                 🔗 Open Original
                             </a>
@@ -222,11 +309,46 @@ const DocumentViewer = ({ file, onClose }) => {
                         </div>
                     </div>
                     <div className="word-content">
-                        {viewerType === 'auto' ? (
+                        {viewerType === 'mammoth' || viewerType === 'auto' ? (
                             <div 
-                                className="word-html-content"
+                                className="word-html-content mammoth-viewer"
                                 dangerouslySetInnerHTML={{ __html: content }}
                             />
+                        ) : viewerType === 'docx-preview' ? (
+                            <div className="docx-preview-wrapper">
+                                <div 
+                                    ref={docxPreviewRef}
+                                    className="docx-preview-container"
+                                />
+                            </div>
+                        ) : viewerType === 'react-doc-viewer' ? (
+                            <div className="react-doc-viewer-wrapper">
+                                <DocViewer
+                                    documents={[{ 
+                                        uri: file.url,
+                                        fileName: file.name,
+                                        fileType: fileExtension
+                                    }]}
+                                    pluginRenderers={DocViewerRenderers}
+                                    config={{
+                                        header: {
+                                            disableHeader: false,
+                                            disableFileName: false,
+                                            retainURLParams: false
+                                        },
+                                        csvDelimiter: ",",
+                                        pdfZoom: {
+                                            defaultZoom: 1.1,
+                                            zoomJump: 0.2
+                                        },
+                                        pdfVerticalScrollByDefault: true
+                                    }}
+                                    style={{
+                                        width: '100%',
+                                        height: '600px'
+                                    }}
+                                />
+                            </div>
                         ) : viewerType === 'external' ? (
                             <iframe
                                 src={`https://docs.google.com/gview?url=${encodeURIComponent(file.url)}&embedded=true`}
@@ -356,7 +478,10 @@ const DocumentViewer = ({ file, onClose }) => {
                         <div className="loading-spinner"></div>
                         <div>Memuat dokumen...</div>
                         <div className="loading-subtitle">
-                            {file.name.endsWith('.docx') ? 'Mengkonversi Word document...' : 'Mengakses konten asli file...'}
+                            {file.name.endsWith('.docx') ? 
+                                `Mengkonversi dengan ${getViewerName(viewerType)}...` : 
+                                'Mengakses konten asli file...'
+                            }
                         </div>
                     </div>
                 )}
@@ -368,6 +493,17 @@ const DocumentViewer = ({ file, onClose }) => {
                         <div className="error-help">
                             <p><strong>Alternatif untuk melihat dokumen:</strong></p>
                             <div className="error-actions">
+                                <button 
+                                    onClick={() => {
+                                        const viewers = ['mammoth', 'docx-preview', 'react-doc-viewer', 'external'];
+                                        const currentIndex = viewers.indexOf(viewerType);
+                                        const nextIndex = (currentIndex + 1) % viewers.length;
+                                        setViewerType(viewers[nextIndex]);
+                                    }}
+                                    className="error-btn"
+                                >
+                                    🔄 Coba Viewer Lain
+                                </button>
                                 <a href={file.url} download className="error-btn">
                                     💾 Download File
                                 </a>
@@ -419,9 +555,9 @@ const DocumentViewer = ({ file, onClose }) => {
                                         <span className="value">{file.name.split('.').pop().toUpperCase()}</span>
                                     </div>
                                     <div className="property">
-                                        <span className="label">Viewer:</span>
-                                        <span className="value">
-                                            {file.name.endsWith('.docx') ? 'Mammoth.js (Local)' : 'Native Browser'}
+                                        <span className="label">Current Viewer:</span>
+                                        <span className="value viewer-name">
+                                            {getViewerName(viewerType)}
                                         </span>
                                     </div>
                                     <div className="property">
@@ -446,23 +582,46 @@ const DocumentViewer = ({ file, onClose }) => {
                                     </a>
                                     {file.name.endsWith('.docx') && (
                                         <button 
-                                            onClick={() => setViewerType(viewerType === 'auto' ? 'external' : 'auto')}
+                                            onClick={() => {
+                                                const viewers = ['mammoth', 'docx-preview', 'react-doc-viewer', 'external'];
+                                                const currentIndex = viewers.indexOf(viewerType);
+                                                const nextIndex = (currentIndex + 1) % viewers.length;
+                                                setViewerType(viewers[nextIndex]);
+                                            }}
                                             className="action-button viewer"
                                         >
-                                            🔄 Switch Viewer
+                                            🔄 Switch Viewer ({getViewerName(viewerType)})
                                         </button>
                                     )}
                                 </div>
                             </div>
 
                             <div className="info-section">
-                                <h4>🔧 Viewer Technology</h4>
-                                <p className="info-text">
-                                    {file.name.endsWith('.docx') ? 
-                                        'File Word ini dikonversi secara lokal menggunakan Mammoth.js untuk menampilkan konten tanpa memerlukan akses internet.' :
-                                        'File ini ditampilkan menggunakan viewer bawaan browser atau layanan eksternal.'
-                                    }
-                                </p>
+                                <h4>🔧 Available Viewers</h4>
+                                {file.name.endsWith('.docx') ? (
+                                    <div className="viewer-comparison">
+                                        <div className="viewer-option">
+                                            <h5>🔤 Mammoth.js</h5>
+                                            <p>Konversi HTML lokal, formatting baik, cepat</p>
+                                        </div>
+                                        <div className="viewer-option">
+                                            <h5>📖 DOCX Preview</h5>
+                                            <p>Rendering native, layout akurat, styling lengkap</p>
+                                        </div>
+                                        <div className="viewer-option">
+                                            <h5>⚛️ React Doc Viewer</h5>
+                                            <p>Multi-format support, interactive UI, zoom controls</p>
+                                        </div>
+                                        <div className="viewer-option">
+                                            <h5>🌐 External Viewer</h5>
+                                            <p>Google Docs integration, cloud processing</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="info-text">
+                                        File ini menggunakan viewer bawaan browser atau layanan eksternal.
+                                    </p>
+                                )}
                             </div>
                         </div>
                     </div>
