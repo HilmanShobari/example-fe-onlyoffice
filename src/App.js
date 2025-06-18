@@ -4,7 +4,6 @@ import FileUpload from './components/FileUpload';
 import FileList from './components/FileList';
 import OnlyOfficeEditor from './components/OnlyOfficeEditor';
 import DocumentViewer from './components/DocumentViewer';
-import OnlyOfficeStatus from './components/OnlyOfficeStatus';
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -42,7 +41,6 @@ function App() {
       </header>
 
       <main className="App-main">
-        <OnlyOfficeStatus />
         <FileUpload onUploadSuccess={handleUploadSuccess} />
         <FileList 
           refreshTrigger={refreshTrigger} 
