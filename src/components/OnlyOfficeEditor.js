@@ -8,6 +8,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [editorMode, setEditorMode] = useState('edit');
+    const [saving, setSaving] = useState(false);
 
     // Load file configuration from backend
     const loadFileConfig = useCallback(async () => {
@@ -113,6 +114,37 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
         loadFileConfig();
     }, [loadFileConfig]);
 
+    // Handle save changes
+    const handleSaveChanges = useCallback(async () => {
+        if (!file?.id || saving) return;
+
+        try {
+            setSaving(true);
+            console.log('Saving changes for file:', file.id);
+            
+            const response = await axios.post(`http://localhost:3001/api/save-changes`, {
+                fileId: file.id,
+                fileName: file.name,
+                documentKey: config?.document?.key || ''
+            }, {
+                timeout: 10000
+            });
+
+            if (response.data.success) {
+                console.log('Save changes successful');
+                // Close the editor modal
+                onClose();
+            } else {
+                throw new Error('Failed to save changes');
+            }
+        } catch (err) {
+            console.error('Error saving changes:', err);
+            setError('Gagal menyimpan perubahan: ' + (err.response?.data?.error || err.message));
+        } finally {
+            setSaving(false);
+        }
+    }, [file?.id, file?.name, config?.document?.key, saving, onClose]);
+
     if (!file) {
         return null;
     }
@@ -139,7 +171,17 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                         </button>
                     </div>
                 </div>
-                <button onClick={onClose} className="close-btn">✕</button>
+                <div className="header-right">
+                    <button 
+                        onClick={handleSaveChanges}
+                        className={`save-btn ${saving ? 'saving' : ''}`}
+                        disabled={saving || loading || error || editorMode === 'view'}
+                        title="Simpan perubahan dan tutup editor"
+                    >
+                        {saving ? '💾 Menyimpan...' : '💾 Save Changes'}
+                    </button>
+                    <button onClick={onClose} className="close-btn">✕</button>
+                </div>
             </div>
 
             <div className="onlyoffice-content">
