@@ -14,7 +14,7 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const fetchFiles = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('https://example-be-onlyoffice.vercel.app//api/files', {
+            const response = await axios.get('https://example-be-onlyoffice.vercel.app/api/files', {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
                 },
