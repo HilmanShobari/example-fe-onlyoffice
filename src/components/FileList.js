@@ -33,7 +33,7 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const handleDelete = async (fileId) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus file ini?')) {
             try {
-                const response = await axios.delete(`https://a38c-36-84-233-118.ngrok-free.app/api/file/${fileId}`, {
+                const response = await axios.delete(`https://example-be-onlyoffice.vercel.app/api/file/${fileId}`, {
                     headers: {
                         'ngrok-skip-browser-warning': 'true',
                     },

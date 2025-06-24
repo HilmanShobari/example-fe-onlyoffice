@@ -20,7 +20,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
 
             console.log('Loading config for file:', file.id);
             
-            const response = await axios.get(`https://a38c-36-84-233-118.ngrok-free.app/api/file/${file.id}`, {
+            const response = await axios.get(`https://example-be-onlyoffice.vercel.app/api/file/${file.id}`, {
                 timeout: 10000,
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
@@ -125,7 +125,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             setSaving(true);
             console.log('Saving changes for file:', file.id);
             
-            const response = await axios.post(`https://a38c-36-84-233-118.ngrok-free.app/api/save-changes`, {
+            const response = await axios.post(`https://example-be-onlyoffice.vercel.app/api/save-changes`, {
                 fileId: file.id,
                 fileName: file.name,
                 documentKey: config?.document?.key || ''
