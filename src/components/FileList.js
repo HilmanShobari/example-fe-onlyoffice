@@ -14,7 +14,11 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const fetchFiles = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:3001/api/files');
+            const response = await axios.get('https://a38c-36-84-233-118.ngrok-free.app/api/files', {
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                },
+            });
             if (response.data.success) {
                 setFiles(response.data.files);
             }
@@ -29,7 +33,11 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const handleDelete = async (fileId) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus file ini?')) {
             try {
-                const response = await axios.delete(`http://localhost:3001/api/file/${fileId}`);
+                const response = await axios.delete(`https://a38c-36-84-233-118.ngrok-free.app/api/file/${fileId}`, {
+                    headers: {
+                        'ngrok-skip-browser-warning': 'true',
+                    },
+                });
                 if (response.data.success) {
                     setFiles(files.filter(file => file.id !== fileId));
                     alert('File berhasil dihapus');

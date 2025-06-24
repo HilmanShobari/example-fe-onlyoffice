@@ -20,8 +20,11 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
 
             console.log('Loading config for file:', file.id);
             
-            const response = await axios.get(`http://localhost:3001/api/file/${file.id}`, {
-                timeout: 10000
+            const response = await axios.get(`https://a38c-36-84-233-118.ngrok-free.app/api/file/${file.id}`, {
+                timeout: 10000,
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                },
             });
 
             if (response.data.success) {
@@ -122,14 +125,14 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             setSaving(true);
             console.log('Saving changes for file:', file.id);
             
-            const response = await axios.post(`http://localhost:3001/api/save-changes`, {
+            const response = await axios.post(`https://a38c-36-84-233-118.ngrok-free.app/api/save-changes`, {
                 fileId: file.id,
                 fileName: file.name,
                 documentKey: config?.document?.key || ''
             }, {
                 timeout: 10000,
                 headers: {
-                    'ngrok-skip-browser-warning': 'false',
+                    'ngrok-skip-browser-warning': 'true',
                 },
             });
 
@@ -228,7 +231,8 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                     >
                         <DocumentEditor
                             id={`onlyoffice-editor-${file.id}`}
-                            documentServerUrl="http://localhost:8888/"
+                            // documentServerUrl="http://localhost:8888/"
+                            documentServerUrl="https://staging-onlyoffice.frackment.id"
                             config={config}
                             events_onDocumentReady={onDocumentReady}
                             events_onDocumentStateChange={onDocumentStateChange}
