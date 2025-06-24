@@ -48,7 +48,7 @@ const FileUpload = ({ onUploadSuccess }) => {
         formData.append('document', selectedFile);
 
         try {
-            const response = await axios.post('https://a38c-36-84-233-118.ngrok-free.app/api/upload', formData, {
+            const response = await axios.post('http://localhost:3001/api/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
