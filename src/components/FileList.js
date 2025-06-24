@@ -14,7 +14,11 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const fetchFiles = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('https://a38c-36-84-233-118.ngrok-free.app/api/files');
+            const response = await axios.get('https://a38c-36-84-233-118.ngrok-free.app/api/files', {
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                },
+            });
             if (response.data.success) {
                 setFiles(response.data.files);
             }
