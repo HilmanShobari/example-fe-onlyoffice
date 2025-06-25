@@ -72,7 +72,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                 errorMessage = "Unknown error loading component: " + errorDescription;
                 break;
             case -2: // Error load DocsAPI from document server
-                errorMessage = "Error loading DocsAPI from document server. Please check if OnlyOffice is running on http://localhost:8888";
+                errorMessage = "Error loading DocsAPI from document server. Please check if OnlyOffice is running on https://staging-onlyoffice.frackment.id";
                 break;
             case -3: // DocsAPI is not defined
                 errorMessage = "DocsAPI is not defined. Document server may not be accessible.";
@@ -209,7 +209,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                             <p><strong>Troubleshooting:</strong></p>
                             <ul>
                                 <li>Pastikan OnlyOffice Document Server berjalan di port 8888</li>
-                                <li>Coba akses <a href="http://localhost:8888" target="_blank" rel="noopener noreferrer">http://localhost:8888</a></li>
+                                <li>Coba akses <a href="https://staging-onlyoffice.frackment.id" target="_blank" rel="noopener noreferrer">https://staging-onlyoffice.frackment.id</a></li>
                                 <li>Periksa console browser untuk error detail</li>
                                 <li>Coba refresh halaman</li>
                             </ul>
@@ -231,7 +231,6 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                     >
                         <DocumentEditor
                             id={`onlyoffice-editor-${file.id}`}
-                            // documentServerUrl="http://localhost:8888/"
                             documentServerUrl="https://staging-onlyoffice.frackment.id"
                             config={config}
                             events_onDocumentReady={onDocumentReady}
