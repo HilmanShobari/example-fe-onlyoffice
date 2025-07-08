@@ -48,7 +48,7 @@ const FileUpload = ({ onUploadSuccess }) => {
         formData.append('document', selectedFile);
 
         try {
-            const response = await axios.post('https://example-be-onlyoffice.vercel.app/api/upload', formData, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

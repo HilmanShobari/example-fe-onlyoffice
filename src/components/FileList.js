@@ -14,7 +14,7 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const fetchFiles = async () => {
         try {
             setLoading(true);
-            const response = await axios.get('https://example-be-onlyoffice.vercel.app/api/files', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/files`, {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
                 },
@@ -33,7 +33,7 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const handleDelete = async (fileId) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus file ini?')) {
             try {
-                const response = await axios.delete(`https://example-be-onlyoffice.vercel.app/api/file/${fileId}`, {
+                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/file/${fileId}`, {
                     headers: {
                         'ngrok-skip-browser-warning': 'true',
                     },
