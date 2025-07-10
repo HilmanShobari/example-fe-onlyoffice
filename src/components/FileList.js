@@ -15,14 +15,14 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/files`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/document/files`, {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            if (response.data.success) {
-                setFiles(response.data.files);
+            if (response.data.code === 200) {
+                setFiles(response.data.data.files);
             }
         } catch (err) {
             setError('Gagal memuat daftar file');
@@ -36,13 +36,13 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus file ini?')) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/file/${fileId}`, {
+                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/document/file/${fileId}`, {
                     headers: {
                         'ngrok-skip-browser-warning': 'true',
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-                if (response.data.success) {
+                if (response.data.code === 200) {
                     setFiles(files.filter(file => file.id !== fileId));
                     alert('File berhasil dihapus');
                 }
@@ -129,15 +129,15 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
                     {files.map((file) => (
                         <div key={file.id} className="file-card">
                             <div className="file-icon">
-                                {getFileIcon(file.name)}
+                                {getFileIcon(file.fileName)}
                             </div>
                             <div className="file-details">
-                                <div className="file-name" title={file.name}>
-                                    {file.name}
+                                <div className="file-name" title={file.fileName}>
+                                    {file.fileName}
                                 </div>
                                 <div className="file-meta">
-                                    <span className="file-size">{formatFileSize(file.size)}</span>
-                                    <span className="file-date">{formatDate(file.uploadDate)}</span>
+                                    <span className="file-size">{formatFileSize(file.fileSize)}</span>
+                                    <span className="file-date">{formatDate(file.createdAt)}</span>
                                 </div>
                             </div>
                             <div className="file-actions">

@@ -11,40 +11,33 @@ function App() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [viewedFile, setViewedFile] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Check for existing authentication on component mount
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    console.log('token:', token);
     
-    if (token && userData) {
+    if (token) {
       try {
-        const parsedUser = JSON.parse(userData);
         setIsAuthenticated(true);
-        setUser(parsedUser);
-        console.log('User already authenticated:', parsedUser);
+        console.log('User already authenticated');
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
       }
     }
     setLoading(false);
   }, []);
 
-  const handleLoginSuccess = (token, userData) => {
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
-    setUser(userData);
-    console.log('Login successful, user authenticated:', userData);
+    console.log('Login successful, user authenticated');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setIsAuthenticated(false);
-    setUser(null);
     setSelectedFile(null);
     setViewedFile(null);
     console.log('User logged out');
@@ -100,7 +93,7 @@ function App() {
             <p>Upload, edit, dan view dokumen menggunakan OnlyOffice</p>
           </div>
           <div className="header-actions">
-            <span className="user-info">Welcome, {user?.username}!</span>
+            <span className="user-info">Welcome!</span>
             <button onClick={handleLogout} className="logout-btn">
               🚪 Logout
             </button>

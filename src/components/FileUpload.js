@@ -45,11 +45,11 @@ const FileUpload = ({ onUploadSuccess }) => {
         setUploadProgress(0);
 
         const formData = new FormData();
-        formData.append('document', selectedFile);
+        formData.append('file', selectedFile);
 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload`, formData, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/document/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
@@ -62,7 +62,7 @@ const FileUpload = ({ onUploadSuccess }) => {
                 }
             });
 
-            if (response.data.success) {
+            if (response.data.code === 200) {
                 alert('File berhasil diupload!');
                 setSelectedFile(null);
                 setUploadProgress(0);

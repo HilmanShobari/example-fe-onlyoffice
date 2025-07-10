@@ -4,7 +4,7 @@ import './Login.css';
 
 const Login = ({ onLoginSuccess }) => {
     const [credentials, setCredentials] = useState({
-        username: '',
+        userName: '',
         password: ''
     });
     const [loading, setLoading] = useState(false);
@@ -22,8 +22,8 @@ const Login = ({ onLoginSuccess }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!credentials.username || !credentials.password) {
-            setError('Please enter both username and password');
+        if (!credentials.userName || !credentials.password) {
+            setError('Please enter both userName and password');
             return;
         }
 
@@ -32,20 +32,19 @@ const Login = ({ onLoginSuccess }) => {
 
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/auth/login`, {
-                userName: credentials.username,
+                userName: credentials.userName,
                 password: credentials.password
             });
 
-            if (response.data.success) {
+            if (response.data.code === 200) {
                 // Store token in localStorage
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+                localStorage.setItem('token', response.data.data.jwtToken);
                 
-                console.log('Login successful:', response.data.user);
+                console.log('Login successful:', response.data.data);
                 
                 // Call the success callback
                 if (onLoginSuccess) {
-                    onLoginSuccess(response.data.token, response.data.user);
+                    onLoginSuccess();
                 }
             }
         } catch (err) {
@@ -66,14 +65,14 @@ const Login = ({ onLoginSuccess }) => {
                 
                 <form onSubmit={handleSubmit} className="login-form">
                     <div className="form-group">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="userName">UserName</label>
                         <input
                             type="text"
-                            id="username"
-                            name="username"
-                            value={credentials.username}
+                            id="userName"
+                            name="userName"
+                            value={credentials.userName}
                             onChange={handleChange}
-                            placeholder="Enter username"
+                            placeholder="Enter userName"
                             disabled={loading}
                             autoComplete="username"
                         />

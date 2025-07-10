@@ -21,7 +21,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             console.log('Loading config for file:', file.id);
             
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/file/${file.id}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/document/file/${file.id}`, {
                 timeout: 10000,
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
@@ -29,8 +29,9 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                 },
             });
 
-            if (response.data.success) {
-                const fileConfig = response.data.config;
+            if (response.data.code === 200) {
+                console.log('response.data config:', response.data);
+                const fileConfig = response.data.data.editorConfig;
                 
                 // Update mode in config
                 const updatedConfig = {
@@ -140,7 +141,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                 },
             });
 
-            if (response.data.success) {
+            if (response.data.code === 200) {
                 console.log('Save changes successful');
                 // Close the editor modal
                 onClose();
