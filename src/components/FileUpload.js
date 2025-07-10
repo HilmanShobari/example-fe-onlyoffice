@@ -48,9 +48,11 @@ const FileUpload = ({ onUploadSuccess }) => {
         formData.append('document', selectedFile);
 
         try {
+            const token = localStorage.getItem('token');
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round(

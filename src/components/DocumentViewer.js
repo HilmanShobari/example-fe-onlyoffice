@@ -28,7 +28,12 @@ const DocumentViewer = ({ file, onClose }) => {
             
             if (fileExtension === 'txt') {
                 // For text files, load directly
-                const response = await axios.get(file.url);
+                const token = localStorage.getItem('token');
+                const response = await axios.get(file.url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
                 setContent(response.data);
             } else if (fileExtension === 'pdf') {
                 // For PDF files, use iframe

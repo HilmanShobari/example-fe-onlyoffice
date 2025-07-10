@@ -20,10 +20,12 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
 
             console.log('Loading config for file:', file.id);
             
+            const token = localStorage.getItem('token');
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/file/${file.id}`, {
                 timeout: 10000,
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
 
@@ -125,6 +127,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             setSaving(true);
             console.log('Saving changes for file:', file.id);
             
+            const token = localStorage.getItem('token');
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/save-changes`, {
                 fileId: file.id,
                 fileName: file.name,
@@ -133,6 +136,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                 timeout: 10000,
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
 

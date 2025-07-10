@@ -14,9 +14,11 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const fetchFiles = async () => {
         try {
             setLoading(true);
+            const token = localStorage.getItem('token');
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/files`, {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (response.data.success) {
@@ -33,9 +35,11 @@ const FileList = ({ refreshTrigger, onFileSelect, onFileView }) => {
     const handleDelete = async (fileId) => {
         if (window.confirm('Apakah Anda yakin ingin menghapus file ini?')) {
             try {
+                const token = localStorage.getItem('token');
                 const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/file/${fileId}`, {
                     headers: {
                         'ngrok-skip-browser-warning': 'true',
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
                 if (response.data.success) {

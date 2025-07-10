@@ -1,14 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import FileUpload from './components/FileUpload';
 import FileList from './components/FileList';
 import OnlyOfficeEditor from './components/OnlyOfficeEditor';
 import DocumentViewer from './components/DocumentViewer';
+import Login from './components/Login';
 
 function App() {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
   const [viewedFile, setViewedFile] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Check for existing authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (token && userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setIsAuthenticated(true);
+        setUser(parsedUser);
+        console.log('User already authenticated:', parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+    setLoading(false);
+  }, []);
+
+  const handleLoginSuccess = (token, userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+    console.log('Login successful, user authenticated:', userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+    setSelectedFile(null);
+    setViewedFile(null);
+    console.log('User logged out');
+  };
 
   const handleUploadSuccess = (file) => {
     // Trigger refresh untuk FileList
@@ -33,11 +73,39 @@ function App() {
     setViewedFile(null);
   };
 
+  // Show loading screen while checking authentication
+  if (loading) {
+    return (
+      <div className="App">
+        <div className="loading-container">
+          <div className="loading-spinner">🔄</div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Show main application when authenticated
   return (
     <div className="App">
       <header className="App-header">
-        <h1>📄 OnlyOffice Document Manager</h1>
-        <p>Upload, edit, dan view dokumen menggunakan OnlyOffice</p>
+        <div className="header-content">
+          <div>
+            <h1>📄 OnlyOffice Document Manager</h1>
+            <p>Upload, edit, dan view dokumen menggunakan OnlyOffice</p>
+          </div>
+          <div className="header-actions">
+            <span className="user-info">Welcome, {user?.username}!</span>
+            <button onClick={handleLogout} className="logout-btn">
+              🚪 Logout
+            </button>
+          </div>
+        </div>
       </header>
 
       <main className="App-main">
