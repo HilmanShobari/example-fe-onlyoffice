@@ -9,6 +9,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
     const [error, setError] = useState(null);
     const [editorMode, setEditorMode] = useState('edit');
     const [saving, setSaving] = useState(false);
+    const [documentServerUrl, setDocumentServerUrl] = useState(null);
 
     // Load file configuration from backend
     const loadFileConfig = useCallback(async () => {
@@ -22,7 +23,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             
             const token = localStorage.getItem('token');
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/document/file/${file.id}`, {
-                timeout: 10000,
+                timeout: 20000,
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
                     'Authorization': `Bearer ${token}`,
@@ -30,8 +31,11 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
             });
 
             if (response.data.code === 200) {
-                console.log('response.data config:', response.data);
-                const fileConfig = response.data.data.editorConfig;
+                // console.log('response.data config:', response.data);
+                console.log('response.data documentServerUrl:', response.data.data.documentServerUrl);
+                console.log('response.data config:', response.data.data.config);
+                const fileConfig = response.data.data.config;
+                setDocumentServerUrl(response.data.data?.documentServerUrl);
                 
                 // Update mode in config
                 const updatedConfig = {
@@ -75,7 +79,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                 errorMessage = "Unknown error loading component: " + errorDescription;
                 break;
             case -2: // Error load DocsAPI from document server
-                errorMessage = "Error loading DocsAPI from document server. Please check if OnlyOffice is running on " + process.env.REACT_APP_ONLYOFFICE_URL;
+                errorMessage = "Error loading DocsAPI from document server. Please check if OnlyOffice is running on " + documentServerUrl;
                 break;
             case -3: // DocsAPI is not defined
                 errorMessage = "DocsAPI is not defined. Document server may not be accessible.";
@@ -214,7 +218,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                             <p><strong>Troubleshooting:</strong></p>
                             <ul>
                                 <li>Pastikan OnlyOffice Document Server berjalan di port 8888</li>
-                                <li>Coba akses <a href={process.env.REACT_APP_ONLYOFFICE_URL} target="_blank" rel="noopener noreferrer">{process.env.REACT_APP_ONLYOFFICE_URL}</a></li>
+                                <li>Coba akses <a href={documentServerUrl} target="_blank" rel="noopener noreferrer">{documentServerUrl}</a></li>
                                 <li>Periksa console browser untuk error detail</li>
                                 <li>Coba refresh halaman</li>
                             </ul>
@@ -236,7 +240,7 @@ const OnlyOfficeEditor = ({ file, onClose }) => {
                     >
                         <DocumentEditor
                             id={`onlyoffice-editor-${file.id}`}
-                            documentServerUrl={process.env.REACT_APP_ONLYOFFICE_URL}
+                            documentServerUrl={documentServerUrl}
                             config={config}
                             events_onDocumentReady={onDocumentReady}
                             events_onDocumentStateChange={onDocumentStateChange}
